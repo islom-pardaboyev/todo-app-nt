@@ -19,24 +19,30 @@ let todoArr = [];
 let deletedTodosArr = [];
 let todoId = 1;
 
-showAllTodos.addEventListener('click', () => renderTodos(todoArr));
+showAllTodos.addEventListener('click', () => {
+    if(todoArr.length == 0){
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">No todos yet</h1>`
+    }else{
+        renderTodos(todoArr, todoCon)
+    }
+});
 showCompletedTodos.addEventListener('click', () => {
     if(todoArr.filter(todo => todo.isCompleted).length == 0){
-        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not Selected</h1>`
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not completed todos yet</h1>`
     }else{
         renderTodos(todoArr.filter(todo => todo.isCompleted), todoCon)
     }
 });
 showUncompletedTodos.addEventListener('click', () => {
     if(todoArr.filter(todo => !todo.isCompleted).length == 0){
-        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not Selected</h1>`
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not uncompleted todos yet</h1>`
     }else{
         renderTodos(todoArr.filter(todo => !todo.isCompleted), todoCon)
     }
 });
 showDeletedTodos.addEventListener('click', () => {
     if(deletedTodosArr.length == 0){
-        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not Selected</h1>`
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not deleted todos yet</h1>`
     }else{
         renderTodos(deletedTodosArr, todoCon)
     }
@@ -69,8 +75,8 @@ function renderTodos(arr) {
         div.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <input type="checkbox" class="scale-150" ${todo.isCompleted ? 'checked' : ''}>
-                    <p class="${todo.isCompleted ? 'line-through text-gray-400' : ''} font-medium text-lg">${todo.title}</p>
+                    <input type="checkbox" class="scale-150 cursor-pointer" ${todo.isCompleted ? 'checked' : ''}>
+                    <p class="${todo.isCompleted ? 'line-through text-gray-600' : ''} font-medium text-lg">${todo.title}</p>
                 </div>
                 <div class="flex items-center gap-3 text-white">
                     <i onclick="editTodo(${todo.id})" class="fa-solid cursor-pointer fa-pen bg-green-600 rounded-md p-2"></i>
@@ -100,21 +106,22 @@ function deleteTodo(todoID) {
         const deletedTodo = todoArr.splice(todoIndex, 1)[0];
         deletedTodosArr.push(deletedTodo);
         renderTodos(todoArr);
+        console.log(deletedTodo);
     }
 }
 
 function editTodo(todoID) {
     const todoToEdit = todoArr.find(todo => todo.id === todoID);
 
-    main.classList.add("blur-sm");
-    editTodoCon.classList.add("top-[50%]");
+    main.classList.add("blur-sm", "transition-all");
+    editTodoCon.classList.add("top-[50%]", "duration-300");
 
     editTodoCon.innerHTML = `
         <form onsubmit="event.preventDefault(); saveEditedTodo(${todoToEdit.id})">
-            <i onclick="closeEditTodo()" class="fa-solid fa-xmark absolute top-2 right-2 cursor-pointer border-2 border-red-500 w-[30px] h-[30px] flex items-center justify-center rounded-full text-red-500"></i>
-            <h1>Edit todo</h1>
-            <input type="text" id="editTodoInput" value="${todoToEdit.title}" placeholder="Enter new value" class="text-center outline-none border-2 border-green-600">
-            <button type="submit" class="bg-green-600 text-white rounded-md px-3 py-1 mt-2">Save</button>
+            <i onclick="closeEditTodo()" class="fa-solid fa-xmark absolute font-bold top-2 right-2 cursor-pointer border-2 border-red-500 w-[30px] h-[30px] flex items-center justify-center rounded-full text-red-500"></i>
+            <h1 class="font-medium text-xl">Edit todo</h1>
+            <input type="text" id="editTodoInput" value="${todoToEdit.title}" placeholder="Enter new value" class="outline-none border-2 border-green-600 font-medium p-2 w-[300px] rounded-md">
+            <button type="submit" class="bg-green-600 text-white rounded-md p-3 mt-2">Save</button>
         </form>
     `;
 }
