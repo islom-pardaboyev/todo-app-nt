@@ -20,9 +20,27 @@ let deletedTodosArr = [];
 let todoId = 1;
 
 showAllTodos.addEventListener('click', () => renderTodos(todoArr));
-showCompletedTodos.addEventListener('click', () => renderTodos(todoArr.filter(todo => todo.isCompleted)));
-showUncompletedTodos.addEventListener('click', () => renderTodos(todoArr.filter(todo => !todo.isCompleted)));
-showDeletedTodos.addEventListener('click', () => renderTodos(deletedTodosArr));
+showCompletedTodos.addEventListener('click', () => {
+    if(todoArr.filter(todo => todo.isCompleted).length == 0){
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not Selected</h1>`
+    }else{
+        renderTodos(todoArr.filter(todo => todo.isCompleted), todoCon)
+    }
+});
+showUncompletedTodos.addEventListener('click', () => {
+    if(todoArr.filter(todo => !todo.isCompleted).length == 0){
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not Selected</h1>`
+    }else{
+        renderTodos(todoArr.filter(todo => !todo.isCompleted), todoCon)
+    }
+});
+showDeletedTodos.addEventListener('click', () => {
+    if(deletedTodosArr.length == 0){
+        todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not Selected</h1>`
+    }else{
+        renderTodos(deletedTodosArr, todoCon)
+    }
+});
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
