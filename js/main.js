@@ -8,6 +8,7 @@ const todosLength = document.querySelector(".todosLength");
 const completedTodosLength = document.querySelector(".completedTodosLength");
 const uncompletedTodoLength = document.querySelector(".uncompletedTodoLength");
 const showAllTodos = document.querySelector("#showAllTodos");
+const errorText = document.querySelector("#errorText")
 const main = document.querySelector("main");
 const showCompletedTodos = document.querySelector("#showCompletedTodos");
 const showUncompletedTodos = document.querySelector("#showUncompletedTodos");
@@ -20,30 +21,30 @@ let deletedTodosArr = [];
 let todoId = 1;
 
 showAllTodos.addEventListener('click', () => {
-    if(todoArr.length == 0){
+    if (todoArr.length == 0) {
         todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">No todos yet</h1>`
-    }else{
+    } else {
         renderTodos(todoArr, todoCon)
     }
 });
 showCompletedTodos.addEventListener('click', () => {
-    if(todoArr.filter(todo => todo.isCompleted).length == 0){
+    if (todoArr.filter(todo => todo.isCompleted).length == 0) {
         todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not completed todos yet</h1>`
-    }else{
+    } else {
         renderTodos(todoArr.filter(todo => todo.isCompleted), todoCon)
     }
 });
 showUncompletedTodos.addEventListener('click', () => {
-    if(todoArr.filter(todo => !todo.isCompleted).length == 0){
+    if (todoArr.filter(todo => !todo.isCompleted).length == 0) {
         todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not uncompleted todos yet</h1>`
-    }else{
+    } else {
         renderTodos(todoArr.filter(todo => !todo.isCompleted), todoCon)
     }
 });
 showDeletedTodos.addEventListener('click', () => {
-    if(deletedTodosArr.length == 0){
+    if (deletedTodosArr.length == 0) {
         todoCon.innerHTML = `<h1 class="flex font-medium text-gray-500 text-xl items-center justify-center">Not deleted todos yet</h1>`
-    }else{
+    } else {
         renderTodos(deletedTodosArr, todoCon)
     }
 });
@@ -58,33 +59,40 @@ form.addEventListener('submit', (e) => {
             id: todoId++,
             isCompleted: false
         };
-        todoArr.push(todoObj);
+        const existingTodo = todoArr.find((todo) => todo.title === todoObj.title);
+        if (!existingTodo) {
+            todoArr.push(todoObj);
+            errorText.textContent = ""
+        } else {
+            errorText.textContent = "Is already exist"
+        }
         inputValue.value = "";
         updateTodosStats();
-        renderTodos(todoArr);
+        renderTodos(todoArr, todoCon);
     } else {
-        alert("Please fill the input");
+        errorText.textContent = "Please fill the input"
     }
 });
 
-function renderTodos(arr) {
-    todoCon.innerHTML = "";
+function renderTodos(arr, list) {
+    list.innerHTML = "";
     arr.forEach(todo => {
+        const {isCompleted, title, id} = todo
         const div = document.createElement("div");
         div.className = "border rounded-md border-black p-2 mb-2";
         div.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <input type="checkbox" class="scale-150 cursor-pointer" ${todo.isCompleted ? 'checked' : ''}>
-                    <p class="${todo.isCompleted ? 'line-through text-gray-600' : ''} font-medium text-lg">${todo.title}</p>
+                    <input type="checkbox" class="scale-150 cursor-pointer" ${isCompleted ? 'checked' : ''}>
+                    <p class="${isCompleted ? 'line-through text-gray-600' : ''} font-medium text-lg">${title}</p>
                 </div>
                 <div class="flex items-center gap-3 text-white">
-                    <i onclick="editTodo(${todo.id})" class="fa-solid cursor-pointer fa-pen bg-green-600 rounded-md p-2"></i>
-                    <i onclick="deleteTodo(${todo.id})" class="fa-solid cursor-pointer fa-trash-can bg-red-600 rounded-md p-2"></i>
+                    <i onclick="editTodo(${id})" class="fa-solid cursor-pointer fa-pen bg-green-600 rounded-md p-2"></i>
+                    <i onclick="deleteTodo(${id})" class="fa-solid cursor-pointer fa-trash-can bg-red-600 rounded-md p-2"></i>
                 </div>
             </div>`;
         div.querySelector('input').addEventListener('click', () => {
-            todo.isCompleted = !todo.isCompleted;
+            isCompleted = !isCompleted;
             updateTodosStats();
             renderTodos(todoArr);
         });
@@ -105,7 +113,7 @@ function deleteTodo(todoID) {
     if (todoIndex !== -1) {
         const deletedTodo = todoArr.splice(todoIndex, 1)[0];
         deletedTodosArr.push(deletedTodo);
-        renderTodos(todoArr);
+        renderTodos(todoArr, todoCon);
         console.log(deletedTodo);
     }
 }
@@ -132,7 +140,7 @@ function saveEditedTodo(todoID) {
     if (todoIndex !== -1) {
         todoArr[todoIndex].title = editedTodoInput.value;
         closeEditTodo();
-        renderTodos(todoArr);
+        renderTodos(todoArr, todoCon);
     }
 }
 
@@ -142,5 +150,5 @@ function closeEditTodo() {
     editTodoCon.innerHTML = "";
 }
 
-renderTodos(todoArr);
+renderTodos(todoArr, todoCon);
 updateTodosStats();
